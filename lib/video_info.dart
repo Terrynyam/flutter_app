@@ -301,7 +301,6 @@ class _VideoInfoState extends State<VideoInfo> {
                     _controller?.setVolume(1.0);
                   }
                   setState(() {
-                    
                   });
                 },
               ),

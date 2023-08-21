@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app1/home_page.dart';
-import 'package:flutter_app1/video_info.dart';
 import 'package:get/get.dart';
 
 
@@ -20,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const VideoInfo(),
+      home: const HomePage(),
     );
   }
 }

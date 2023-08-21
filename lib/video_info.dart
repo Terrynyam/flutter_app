@@ -68,7 +68,6 @@ class _VideoInfoState extends State<VideoInfo> {
               children: [
                 Row(
                   children: [
-
                     InkWell(
                       onTap: (){
                         Get.back();
@@ -157,33 +156,32 @@ class _VideoInfoState extends State<VideoInfo> {
                 )
               ],
             ),
-          ):Container(
-            child: Column(
-              children: [
-                Container(
-                  height: 100,
-                  padding: const EdgeInsets.only(top: 50,left: 30,right: 30),
-                  child: Row(
-                    children: [
-                      InkWell(
-                        onTap: (){
+          ):Column(
+            children: [
+              Container(
+                height: 100,
+                padding: const EdgeInsets.only(top: 50,left: 30,right: 30),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: (){
 
-                        },
-                        child: Icon(Icons.arrow_back_ios,
-                        size: 20,
-                        color: color.AppColor.secondPageTopIconColor,),
-                      ),
-                      Expanded(child: Container()),
-                      Icon(Icons.info_outline,
+                        Get.back();
+                      },
+                      child: Icon(Icons.arrow_back_ios,
                       size: 20,
-                      color: color.AppColor.secondPageTopIconColor,)
-                    ],
-                  ),
+                      color: color.AppColor.secondPageTopIconColor,),
+                    ),
+                    Expanded(child: Container()),
+                    Icon(Icons.info_outline,
+                    size: 20,
+                    color: color.AppColor.secondPageTopIconColor,)
+                  ],
                 ),
-                _playView(context),
-                _controlView(context)
-              ],
-            ),
+              ),
+              _playView(context),
+              _controlView(context)
+            ],
           ),
           Expanded(child: Container(
             decoration: const BoxDecoration(
@@ -257,7 +255,7 @@ class _VideoInfoState extends State<VideoInfo> {
     return value < 10? "0$value" : "$value";
   }
  Widget _controlView(BuildContext context){
-    final unMute = (_controller?.value?.volume??0)>0;
+    final unMute = (_controller?.value.volume??0)>0;
     final duration = _duration?.inSeconds ?? 0;
     final head = _position?.inSeconds ??0;
     final remained = max(0,duration - head);
@@ -266,6 +264,48 @@ class _VideoInfoState extends State<VideoInfo> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        SliderTheme(data: SliderTheme.of(context).copyWith(
+            activeTrackColor: Colors.red[700],
+            inactiveTrackColor: Colors.red[100],
+            trackShape: RoundedRectSliderTrackShape(),
+            trackHeight: 2.0,
+            thumbShape: RoundSliderThumbShape(
+                enabledThumbRadius: 12.0),
+            tickMarkShape: RoundSliderTickMarkShape(),
+            activeTickMarkColor: Colors.red[700],
+            inactiveTickMarkColor: Colors.red[100],
+            valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+            valueIndicatorColor: Colors.redAccent,
+            valueIndicatorTextStyle: TextStyle(
+              color: Colors.white,
+            )
+        ),
+          child: Slider(
+            value: max(0,min(_progress * 100, 100)),
+            min: 0,
+            max: 100,
+            divisions: 100,
+            label: _position?.toString().split(".")[0],
+            onChanged: (value) {
+              setState(() {
+                _progress = value * 0.01;
+              });
+            },
+            onChangeStart: (value){
+              _controller?.pause();
+            },
+            onChangeEnd: (value){
+              final duration = _controller?.value?.duration;
+              if (duration != null){
+                var newValue = max(0, min(value, 99)) * 0.01;
+                var millis = (duration.inMilliseconds * newValue).toInt();
+                _controller?.seekTo(Duration(milliseconds: millis));
+                _controller?.play();
+              }
+            },
+          ),
+
+        ),
         Container(
           height: 40,
           width: MediaQuery.of(context).size.width,
@@ -430,7 +470,7 @@ class _VideoInfoState extends State<VideoInfo> {
             duration.inMilliseconds.ceilToDouble());
       });
     }
-    _isPlaying = playing!;
+    _isPlaying = playing;
   }
 
   _onTapVideo(int index){
@@ -499,14 +539,14 @@ class _VideoInfoState extends State<VideoInfo> {
                 children: [
                   Text(
                     videoInfo[index]["title"],
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold
                     ),
                   ),
                   const SizedBox(height: 10,),
                   Padding(
-                    padding: EdgeInsets.only(top: 3),
+                    padding: const EdgeInsets.only(top: 3),
                     child: Text(
                       videoInfo[index]["time"],
                       style: TextStyle(
